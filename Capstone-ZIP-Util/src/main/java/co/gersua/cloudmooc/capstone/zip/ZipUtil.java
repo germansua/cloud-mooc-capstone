@@ -58,16 +58,25 @@ public class ZipUtil {
             return;
         }
 
+        String zipName = zipFile.getName();
+        int dotZipIndex = zipName.toLowerCase().lastIndexOf(".zip");
+        String cotainerFolder = zipName.substring(0, dotZipIndex);
+
         String outputFolder = zipFile.getParent();
         String fileSeparator = System.getProperty("file.separator");
+        boolean successful = true;
 
         try (FileInputStream fis = new FileInputStream(zipFile)) {
             try (ZipInputStream zis = new ZipInputStream(fis)) {
 
                 ZipEntry nextEntry;
                 while ((nextEntry = zis.getNextEntry()) != null) {
-                    String fileName = String.format("%s%s%s", outputFolder, fileSeparator, nextEntry.getName());
+
+                    String fileName = String.format(
+                            "%s%s%s%s%s", outputFolder, fileSeparator, cotainerFolder,
+                            fileSeparator, nextEntry.getName());
                     File file = new File(fileName);
+                    new File(file.getParent()).mkdir();
 
                     if (nextEntry.isDirectory()) {
                         file.mkdir();
@@ -83,15 +92,20 @@ public class ZipUtil {
                             String message = String.format(
                                     "There was a problem uncompressing the file: %s.", nextEntry.getName());
                             LOGGER.error(message, ex);
+                            successful = false;
                         }
                     }
                 }
             } catch (IOException ex) {
                 LOGGER.error("There was a problem trying to create a ZIP.", ex);
+                successful = false;
             }
         } catch (IOException ex) {
             LOGGER.error("There was a problem trying to open a FIS.", ex);
+            successful = false;
         }
+
+        LOGGER.info("Was successful result?: {}.\tFile processed: {}\t", successful, zipFile.getAbsolutePath());
     }
 
     /**
