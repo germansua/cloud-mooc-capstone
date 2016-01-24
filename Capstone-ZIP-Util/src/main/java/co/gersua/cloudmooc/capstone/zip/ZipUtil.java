@@ -1,5 +1,8 @@
 package co.gersua.cloudmooc.capstone.zip;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +11,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtil.class);
 
     private static final FileFilter DIRECTORIES_FILTER = file -> file.isDirectory();
     private static final FileFilter ZIP_FILES_FILTER = file -> file.getName().toLowerCase().endsWith(".zip");
@@ -20,7 +25,7 @@ public class ZipUtil {
 
         File folderFile = new File(folder);
         if (!folderFile.exists() || !folderFile.isDirectory()) {
-            // TODO Log here
+            LOGGER.error("The location: {} does not exist or not represent a directory.", folder);
             return;
         }
 
@@ -49,7 +54,7 @@ public class ZipUtil {
      */
     public static void unzip(File zipFile) {
         if (!zipFile.exists()) {
-            // TODO Log here
+            LOGGER.error("The file: {} does not exist.", zipFile.getAbsolutePath());
             return;
         }
 
@@ -75,15 +80,17 @@ public class ZipUtil {
                                 fos.write(buffer, 0, bytesRead);
                             }
                         } catch (IOException ex) {
-                            // TODO Log here
+                            String message = String.format(
+                                    "There was a problem uncompressing the file: %s.", nextEntry.getName());
+                            LOGGER.error(message, ex);
                         }
                     }
                 }
             } catch (IOException ex) {
-                // TODO Log here
+                LOGGER.error("There was a problem trying to create a ZIP.", ex);
             }
         } catch (IOException ex) {
-            // TODO Log here
+            LOGGER.error("There was a problem trying to open a FIS.", ex);
         }
     }
 
