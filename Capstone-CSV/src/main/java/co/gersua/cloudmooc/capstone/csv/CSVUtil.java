@@ -38,26 +38,25 @@ public class CSVUtil {
             for (File csvFile : csvFiles) {
                 Set<String> headers = headers(csvFile);
 
-                for (String header : headers) {
+                headers.stream().forEach(header -> {
                     Integer headerCounter = uniqueHeaderMap.get(header);
-                    headerCounter = headerCounter != null ?  ++headerCounter : Integer.valueOf(1);
+                    headerCounter = headerCounter != null ?  ++headerCounter : 1;
                     uniqueHeaderMap.put(header, headerCounter);
-                }
+                });
             }
 
             File[] innerDirectories = location.listFiles(DIRECTORIES_FILTER);
             for (File innerDirectory : innerDirectories) {
 
                 Map<String, Integer> innerCount = headersCount(innerDirectory);
-                for (Map.Entry<String, Integer> innerEntry : innerCount.entrySet()) {
-
+                innerCount.entrySet().stream().forEach(innerEntry -> {
                     String innerHeader = innerEntry.getKey();
                     Integer innerHeaderValue = innerEntry.getValue();
 
                     Integer headerCounter = uniqueHeaderMap.get(innerHeader);
                     headerCounter = headerCounter != null ?  headerCounter + innerHeaderValue : innerHeaderValue;
                     uniqueHeaderMap.put(innerHeader, headerCounter);
-                }
+                });
             }
         }
 
@@ -73,10 +72,7 @@ public class CSVUtil {
                 if (scanner.hasNextLine()) {
                     String headerLine = scanner.nextLine();
                     String[] splittedHeaderLine = headerLine.split(",");
-
-                    for (String header : splittedHeaderLine) {
-                        headers.add(header);
-                    }
+                    headers.addAll(Arrays.asList(splittedHeaderLine));
                 }
             } catch (FileNotFoundException ex) {
                 String message = String.format("File %s was not found.", csvFile);
