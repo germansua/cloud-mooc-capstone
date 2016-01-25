@@ -47,7 +47,17 @@ public class CSVUtil {
 
             File[] innerDirectories = location.listFiles(DIRECTORIES_FILTER);
             for (File innerDirectory : innerDirectories) {
-                uniqueHeaderMap.putAll(headersCount(innerDirectory));
+
+                Map<String, Integer> innerCount = headersCount(innerDirectory);
+                for (Map.Entry<String, Integer> innerEntry : innerCount.entrySet()) {
+
+                    String innerHeader = innerEntry.getKey();
+                    Integer innerHeaderValue = innerEntry.getValue();
+
+                    Integer headerCounter = uniqueHeaderMap.get(innerHeader);
+                    headerCounter = headerCounter != null ?  headerCounter + innerHeaderValue : innerHeaderValue;
+                    uniqueHeaderMap.put(innerHeader, headerCounter);
+                }
             }
         }
 
