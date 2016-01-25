@@ -36,7 +36,7 @@ public class ZipUtil {
     private static List<File> getZipFiles(File parentDirectory) {
         List<File> zipList = new ArrayList<>();
 
-        if (parentDirectory.exists() && parentDirectory.isDirectory()) {
+        if (parentDirectory != null && parentDirectory.isDirectory()) {
             zipList.addAll(Arrays.asList(parentDirectory.listFiles(ZIP_FILES_FILTER)));
 
             File[] directories = parentDirectory.listFiles(DIRECTORIES_FILTER);
