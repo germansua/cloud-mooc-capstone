@@ -15,9 +15,9 @@ public class Main {
 
         Job job = Job.getInstance(conf, "10 most popular airports by numbers of flights to/from the airport");
         job.setJarByClass(Main.class);
-        job.setMapperClass(G1Q1Mapper.class);
-        job.setCombinerClass(G1Q1Reducer.class);
-        job.setReducerClass(G1Q1Reducer.class);
+        job.setMapperClass(AirportsByNumberOfFlightsMapper.class);
+        job.setCombinerClass(AirportsByNumberOfFlightsReducer.class);
+        job.setReducerClass(AirportsByNumberOfFlightsReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 

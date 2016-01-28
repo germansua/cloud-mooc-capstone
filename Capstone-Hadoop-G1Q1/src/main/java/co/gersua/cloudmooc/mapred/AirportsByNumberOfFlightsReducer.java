@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public class G1Q1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+public class AirportsByNumberOfFlightsReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context)

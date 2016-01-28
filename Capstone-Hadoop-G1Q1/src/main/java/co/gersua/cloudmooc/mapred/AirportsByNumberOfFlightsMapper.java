@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 
-public class G1Q1Mapper extends Mapper<Object, Text, Text, IntWritable> {
+public class AirportsByNumberOfFlightsMapper extends Mapper<Object, Text, Text, IntWritable> {
 
     private static final IntWritable count = new IntWritable(1);
 
