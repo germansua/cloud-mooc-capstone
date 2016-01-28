@@ -27,9 +27,8 @@ public class CSVTransformer {
         File[] directories = location.listFiles(DIRECTORIES_FILTER);
         File[] csvFiles = location.listFiles(CSV_FILES_FILTER);
 
-        for (File directory : directories) {
-            transformFiles(directory, commonDestination, suffix, headers);
-        }
+        Arrays.asList(directories).parallelStream().forEach(directory ->
+                transformFiles(directory, commonDestination, suffix, headers));
 
         Arrays.asList(csvFiles).parallelStream().forEach(csvFile -> {
             String fileName = csvFile.getName().concat(suffix).concat(".txt");
