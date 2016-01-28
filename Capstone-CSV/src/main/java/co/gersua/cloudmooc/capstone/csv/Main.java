@@ -15,6 +15,6 @@ public class Main {
 //        CSVUtil.pushResults(rootLocationFile);
 
         // Transformer for Group 1 Question 1
-        CSVTransformer.transformFiles(rootLocationFile, ".tx.g1.q1", "\"Origin\"", "\"Dest\"");
+        CSVTransformer.transformFiles(rootLocationFile, new File(rootLocation, "tx.g1.q1"), ".tx.g1.q1", "\"Origin\"", "\"Dest\"");
     }
 }

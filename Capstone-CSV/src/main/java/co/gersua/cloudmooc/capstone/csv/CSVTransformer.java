@@ -16,25 +16,24 @@ public class CSVTransformer {
     private static final FileFilter DIRECTORIES_FILTER = file -> file.isDirectory();
     private static final FileFilter CSV_FILES_FILTER = file -> file.getName().toLowerCase().endsWith(".csv");
 
-    public static void transformFiles(File location, String suffix, String... headers) {
+    public static void transformFiles(File location, File commonDestination, String suffix, String... headers) {
 
-        if (location == null || !location.isDirectory() || headers.length == 0) {
+        if (location == null || !location.isDirectory() || commonDestination == null || headers.length == 0) {
             LOGGER.error("Invalid arguments.");
             return;
         }
 
+        commonDestination.mkdir();
         File[] directories = location.listFiles(DIRECTORIES_FILTER);
         File[] csvFiles = location.listFiles(CSV_FILES_FILTER);
 
         for (File directory : directories) {
-            transformFiles(directory, suffix, headers);
+            transformFiles(directory, commonDestination, suffix, headers);
         }
 
         for (File csvFile : csvFiles) {
-            String parent = csvFile.getParent();
             String fileName = csvFile.getName().concat(suffix).concat(".txt");
-
-            transform(csvFile, new File(parent, fileName), headers);
+            transform(csvFile, new File(commonDestination, fileName), headers);
         }
     }
 

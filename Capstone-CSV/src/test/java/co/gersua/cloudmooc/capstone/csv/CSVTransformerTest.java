@@ -26,6 +26,6 @@ public class CSVTransformerTest extends TestCase {
     }
 
     public void testTransformFiles() throws Exception {
-        CSVTransformer.transformFiles(new File("/Users/gersua/Desktop"), ".tx.g1.q1", "\"Origin\"", "\"Dest\"");
+        CSVTransformer.transformFiles(new File("/Users/gersua/Desktop"), new File("/Users/gersua/Desktop/Test/common"), ".tx.g1.q1", "\"Origin\"", "\"Dest\"");
     }
 }
