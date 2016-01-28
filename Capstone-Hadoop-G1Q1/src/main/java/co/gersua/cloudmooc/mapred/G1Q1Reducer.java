@@ -11,5 +11,11 @@ public class G1Q1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
             throws IOException, InterruptedException {
+
+        int airportCount = 0;
+        for (IntWritable value : values) {
+            airportCount += value.get();
+        }
+        context.write(key, new IntWritable(airportCount));
     }
 }
