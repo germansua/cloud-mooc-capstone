@@ -11,6 +11,10 @@ public class Main {
         }
 
         String rootLocation = args[0];
-        CSVUtil.pushResults(new File(rootLocation));
+        File rootLocationFile = new File(rootLocation);
+//        CSVUtil.pushResults(rootLocationFile);
+
+        // Transformer for Group 1 Question 1
+        CSVTransformer.transformFiles(rootLocationFile, ".tx.g1.q1", "\"Origin\"", "\"Dest\"");
     }
 }
