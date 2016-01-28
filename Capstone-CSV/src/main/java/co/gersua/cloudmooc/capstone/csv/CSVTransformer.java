@@ -46,6 +46,8 @@ public class CSVTransformer {
             return;
         }
 
+        LOGGER.info("Processing file: {}", src.getAbsolutePath());
+
         try (Scanner scanner = new Scanner(src)) {
             int lineCounter = 0;
             Set<Integer> indices = new TreeSet<>();
