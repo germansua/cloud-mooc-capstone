@@ -31,10 +31,10 @@ public class CSVTransformer {
             transformFiles(directory, commonDestination, suffix, headers);
         }
 
-        for (File csvFile : csvFiles) {
+        Arrays.asList(csvFiles).parallelStream().forEach(csvFile -> {
             String fileName = csvFile.getName().concat(suffix).concat(".txt");
             transform(csvFile, new File(commonDestination, fileName), headers);
-        }
+        });
     }
 
     public static void transform(File src, File dst, String... headers) {
