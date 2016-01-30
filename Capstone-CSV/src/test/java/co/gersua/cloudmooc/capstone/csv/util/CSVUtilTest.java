@@ -1,5 +1,6 @@
-package co.gersua.cloudmooc.capstone.csv;
+package co.gersua.cloudmooc.capstone.csv.util;
 
+import co.gersua.cloudmooc.capstone.csv.util.CSVUtil;
 import org.junit.Test;
 
 import java.io.File;

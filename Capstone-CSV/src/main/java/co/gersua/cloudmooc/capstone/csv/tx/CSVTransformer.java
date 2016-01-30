@@ -1,4 +1,4 @@
-package co.gersua.cloudmooc.capstone.csv;
+package co.gersua.cloudmooc.capstone.csv.tx;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +45,17 @@ public class CSVTransformer {
         }
 
         LOGGER.info("Processing file: {}", src.getAbsolutePath());
+        System.out.println(String.format("Processing file: %s", src.getAbsolutePath()));
 
-        try (Scanner scanner = new Scanner(src)) {
+        try (BufferedReader br = new BufferedReader(new FileReader(src))) {
             int lineCounter = 0;
             Set<Integer> indices = new TreeSet<>();
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(dst))) {
 
-                while (scanner.hasNextLine()) {
-                    List<String> words = wordSplitter(scanner.nextLine());
+                String line;
+                while ((line = br.readLine()) != null) {
+                    List<String> words = wordSplitter(line);
 
                     if (HEADER_LINE_NUMBER == lineCounter++) {
                         for (String header : headers) {
