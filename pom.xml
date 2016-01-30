@@ -18,5 +18,6 @@
         <module>Capstone-CSV</module>
         <module>Capstone-ZIP-Util</module>
     <module>Capstone-Hadoop-G1Q1</module>
+    <module>Capstone-Hadoop-G1Q2</module>
   </modules>
 </project>

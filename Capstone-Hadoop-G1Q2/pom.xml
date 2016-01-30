@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>co.gersua.cloudmooc</groupId>
-    <artifactId>Capstone-Hadoop-G1Q1</artifactId>
+    <artifactId>Capstone-Hadoop-G1Q2</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Capstone-Hadoop-G1Q1</name>
+    <name>Capstone-Hadoop-G1Q2</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +29,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>co.gersua.cloudmooc.mapred.Main</mainClass>
+                            <mainClass>co.gersua.cloudmooc.mapred.g1q2.Main</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>

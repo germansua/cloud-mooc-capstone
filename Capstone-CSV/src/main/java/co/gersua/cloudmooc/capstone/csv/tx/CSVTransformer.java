@@ -16,7 +16,7 @@ public class CSVTransformer {
     private static final FileFilter DIRECTORIES_FILTER = file -> file.isDirectory();
     private static final FileFilter CSV_FILES_FILTER = file -> file.getName().toLowerCase().endsWith(".csv");
 
-    public static void transformFiles(File location, File commonDestination, String suffix, String... headers) {
+    public static void transformFiles(File location, File commonDestination, String suffix, SeparatorEnum separator, String... headers) {
 
         if (location == null || !location.isDirectory() || commonDestination == null || headers.length == 0) {
             LOGGER.error("Invalid arguments.");
@@ -28,15 +28,15 @@ public class CSVTransformer {
         File[] csvFiles = location.listFiles(CSV_FILES_FILTER);
 
         Arrays.asList(directories).parallelStream().forEach(directory ->
-                transformFiles(directory, commonDestination, suffix, headers));
+                transformFiles(directory, commonDestination, suffix, separator, headers));
 
         Arrays.asList(csvFiles).parallelStream().forEach(csvFile -> {
             String fileName = csvFile.getName().concat(suffix).concat(".txt");
-            transform(csvFile, new File(commonDestination, fileName), headers);
+            transform(csvFile, new File(commonDestination, fileName), separator, headers);
         });
     }
 
-    public static void transform(File src, File dst, String... headers) {
+    public static void transform(File src, File dst, SeparatorEnum separator, String... headers) {
 
         if (src == null || !src.exists() || dst == null || headers.length == 0) {
             LOGGER.error("Invalid arguments src == null {}, !src.exists() {}, dst == null {} headers.length == 0 {}",
@@ -66,7 +66,7 @@ public class CSVTransformer {
                         }
                     } else {
                         StringBuffer lineBuffer = new StringBuffer();
-                        indices.stream().forEach(index -> lineBuffer.append(words.get(index)).append("\n"));
+                        indices.stream().forEach(index -> lineBuffer.append(words.get(index)).append(separator.getValue()));
                         lineBuffer.deleteCharAt(lineBuffer.length() - 1);
                         bw.write(lineBuffer.toString());
                         bw.newLine();
