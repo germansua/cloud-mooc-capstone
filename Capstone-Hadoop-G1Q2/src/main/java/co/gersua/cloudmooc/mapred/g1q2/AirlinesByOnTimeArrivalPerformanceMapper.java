@@ -13,8 +13,13 @@ public class AirlinesByOnTimeArrivalPerformanceMapper extends Mapper<Object, Tex
             throws IOException, InterruptedException {
 
         String[] data = value.toString().split("\\s");
-        String airlineId = data[0];
-        double arrDelayMinutes = Double.valueOf(data[1]);
-        context.write(new Text(airlineId), new DoubleWritable(arrDelayMinutes));
+
+        if (data.length == 2) {
+            String airlineId = data[0];
+            double arrDelayMinutes = Double.valueOf(data[1]);
+            context.write(new Text(airlineId), new DoubleWritable(arrDelayMinutes));
+        } else {
+            System.out.println("*** VALUE READ: " + value.toString() + " Key: " + key.toString() + " ***");
+        }
     }
 }
