@@ -22,7 +22,11 @@ public class Main {
 //                new File(rootLocation, "tx.g1.q1"), ".tx.g1.q1", SeparatorEnum.NEW_LINE, "\"Origin\"", "\"Dest\"");
 
         // Transformer for Group 1 Question 2
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g1.q2"), ".tx.g1.q2", SeparatorEnum.TAB, "\"AirlineID\"", "\"ArrDelayMinutes\"");
+
+        // Transformer for Group 1 Question 3
         CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g1.q2"), ".tx.g1.q2", SeparatorEnum.TAB, "\"AirlineID\"", "\"ArrDelayMinutes\"");
+                new File(rootLocation, "tx.g1.q3"), ".tx.g1.q3", SeparatorEnum.TAB, "\"DayOfWeek\"", "\"ArrDelayMinutes\"");
     }
 }
