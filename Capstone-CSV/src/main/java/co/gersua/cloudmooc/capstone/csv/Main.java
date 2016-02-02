@@ -29,14 +29,19 @@ public class Main {
 //        CSVTransformer.transformFiles(rootLocationFile,
 //                new File(rootLocation, "tx.g1.q3"), ".tx.g1.q3", SeparatorEnum.TAB, "\"DayOfWeek\"", "\"ArrDelayMinutes\"");
 
-        // Transformer for Group 1 Question 3
+        // Transformer for Group 2 Question 1
 //        CSVTransformer.transformFiles(rootLocationFile,
 //                new File(rootLocation, "tx.g2.q1"), ".tx.g2.q1", SeparatorEnum.TAB,
 //                "\"Origin\"", "\"UniqueCarrier\"", "\"DepDelayMinutes\"");
 
-        // Transformer for Group 1 Question 3
+        // Transformer for Group 2 Question 2
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g2.q2"), ".tx.g2.q2", SeparatorEnum.TAB,
+//                "\"Origin\"", "\"Dest\"", "\"DepDelayMinutes\"");
+
+        // Transformer for Group 2 Question 3
         CSVTransformer.transformFiles(rootLocationFile,
                 new File(rootLocation, "tx.g2.q2"), ".tx.g2.q2", SeparatorEnum.TAB,
-                "\"Origin\"", "\"Dest\"", "\"DepDelayMinutes\"");
+                "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelayMinutes\"");
     }
 }
