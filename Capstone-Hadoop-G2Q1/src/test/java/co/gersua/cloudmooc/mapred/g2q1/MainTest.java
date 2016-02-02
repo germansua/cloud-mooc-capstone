@@ -1,38 +1,20 @@
 package co.gersua.cloudmooc.mapred.g2q1;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
 
-/**
- * Unit test for simple Main.
- */
-public class MainTest
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public MainTest(String testName )
-    {
-        super( testName );
-    }
+import java.util.Arrays;
+import java.util.List;
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( MainTest.class );
-    }
+public class MainTest {
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    @Test
+    public void test() {
+
+        List<Integer> list = Arrays.asList(1, 2,  3, 4, 5, 6, 7, 8);
+        int toIndex = list.size() > 10 ? 10 : list.size();
+
+        List<Integer> integers = list.subList(0, toIndex);
+
+        System.out.println(integers);
     }
 }

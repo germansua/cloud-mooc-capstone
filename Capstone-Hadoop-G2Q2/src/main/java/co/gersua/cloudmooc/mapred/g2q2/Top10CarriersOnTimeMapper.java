@@ -1,4 +1,4 @@
-package co.gersua.cloudmooc.mapred.g2q1;
+package co.gersua.cloudmooc.mapred.g2q2;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -17,7 +17,11 @@ public class Top10CarriersOnTimeMapper extends Mapper<Text, Text, NullWritable, 
 
         String airportCarrier = key.toString();
         Double departureDelay = Double.valueOf(value.toString());
+
         topCounter.add(new Pair<Double, String>(departureDelay, airportCarrier));
+        if (topCounter.size() > 10) {
+            topCounter.remove(topCounter.last());
+        }
     }
 
     @Override
