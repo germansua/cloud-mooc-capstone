@@ -49,7 +49,7 @@ public class CSVTransformer {
 
         try (BufferedReader br = new BufferedReader(new FileReader(src))) {
             int lineCounter = 0;
-            Set<Integer> indices = new TreeSet<>();
+            List<Integer> indices = new ArrayList<>();
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(dst))) {
 
@@ -67,9 +67,10 @@ public class CSVTransformer {
                     } else {
                         StringBuffer lineBuffer = new StringBuffer();
                         indices.stream().forEach(index -> lineBuffer.append(words.get(index)).append(separator.getValue()));
-                        lineBuffer.deleteCharAt(lineBuffer.length() - 1);
                         bw.write(lineBuffer.toString());
-                        bw.newLine();
+                        if (!separator.equals(SeparatorEnum.NEW_LINE)) {
+                            bw.newLine();
+                        }
                     }
                 }
             } catch (IOException ex) {

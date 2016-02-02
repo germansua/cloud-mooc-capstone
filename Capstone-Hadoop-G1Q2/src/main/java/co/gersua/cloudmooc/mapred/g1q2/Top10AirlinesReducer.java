@@ -24,7 +24,7 @@ public class Top10AirlinesReducer extends Reducer<NullWritable, TextArrayWritabl
 
             topCounter.add(new Pair<Double, String>(delay, airline));
             if (topCounter.size() > 10) {
-                topCounter.remove(topCounter.first());
+                topCounter.remove(topCounter.last());
             }
         }
 
