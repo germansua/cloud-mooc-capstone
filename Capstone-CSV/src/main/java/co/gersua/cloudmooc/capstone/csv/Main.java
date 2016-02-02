@@ -41,7 +41,7 @@ public class Main {
 
         // Transformer for Group 2 Question 3
         CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g2.q2"), ".tx.g2.q2", SeparatorEnum.TAB,
+                new File(rootLocation, "tx.g2.q3"), ".tx.g2.q3", SeparatorEnum.TAB,
                 "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelayMinutes\"");
     }
 }
