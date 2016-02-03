@@ -31,9 +31,9 @@ public class FlightResult implements Comparable<FlightResult> {
             return -1;
         }
 
-        String current = String.format("%s%s%s%ld", originAirport, stopAirport, destinationAirport, Double.valueOf(totalArrivalDelay).longValue());
-        String compare = String.format("%s%s%s%ld", getOriginAirport(), getStopAirport(),
-                getDestinationAirport(), getTotalArrivalDelay());
+        String current = String.format("%s%s%s%d", originAirport, stopAirport, destinationAirport, Double.valueOf(totalArrivalDelay).longValue());
+        String compare = String.format("%s%s%s%d", getOriginAirport(), getStopAirport(),
+                getDestinationAirport(), Double.valueOf(getTotalArrivalDelay()).longValue());
 
         return current.compareTo(compare);
     }
@@ -42,7 +42,7 @@ public class FlightResult implements Comparable<FlightResult> {
     public String toString() {
         String firstDateString = DATE_FORMAT.format(firstDate);
         String secondDateString = DATE_FORMAT.format(secondDate);
-        return String.format("%s\t%s\t%s\t%s\t%s\t%ld",
+        return String.format("%s\t%s\t%s\t%s\t%s\t%d",
                 originAirport, stopAirport, destinationAirport, firstDateString, secondDateString, Double.valueOf(totalArrivalDelay).longValue());
     }
 
