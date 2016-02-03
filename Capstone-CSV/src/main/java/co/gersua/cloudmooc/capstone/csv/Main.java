@@ -40,8 +40,15 @@ public class Main {
 //                "\"Origin\"", "\"Dest\"", "\"DepDelayMinutes\"");
 
         // Transformer for Group 2 Question 3
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g2.q3"), ".tx.g2.q3", SeparatorEnum.TAB,
+//                "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelayMinutes\"");
+
+        // For Group 3 Question 1 the data used is the same that Group 1 Question 1
+
+        // Transformer for Group 3 Question 2
         CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g2.q3"), ".tx.g2.q3", SeparatorEnum.TAB,
-                "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelayMinutes\"");
+                new File(rootLocation, "tx.g3.q2"), ".tx.g3.q2", SeparatorEnum.TAB,
+                "\"Origin\"", "\"Dest\"", "\"FlightDate\"", "\"CRSDepTime\"", "\"ArrDelayMinutes\"");
     }
 }
