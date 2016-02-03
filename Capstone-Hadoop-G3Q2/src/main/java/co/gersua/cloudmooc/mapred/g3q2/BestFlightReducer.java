@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
@@ -26,16 +27,28 @@ public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
             }
 
             if (flightInfo.getType().equals("ORG")) {
-                origins.add(flightInfo);
+                if (flightInfo.getDepartureTime() >= 1200) {
+                    origins.add(flightInfo);
+                }
             } else {
-                destinations.add(flightInfo);
+                if (flightInfo.getDepartureTime() <= 1200) {
+                    destinations.add(flightInfo);
+                }
             }
         }
 
-
         for (FlightInfo dest : destinations) {
             for (FlightInfo org : origins) {
-                
+
+                Calendar calendarOrg = Calendar.getInstance();
+                calendarOrg.setTime(org.getFlightDate());
+
+                Calendar calendarDest = Calendar.getInstance();
+                calendarDest.setTime(dest.getFlightDate());
+
+//                calendarDest.
+//
+//                if (dest.getDepartureTime())
             }
         }
     }
