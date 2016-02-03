@@ -7,11 +7,21 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BestFlightReducerTest {
 
-    private static final String pattern = "yyyymmdd";
+    private static final String pattern = "yyyyMMdd";
     private static final SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+
+    @Test
+    public void testReduceTimes() throws Exception {
+        String time = "0123";
+        assertEquals(Long.valueOf(123L), Long.valueOf(time.replaceAll("\"","")));
+
+        String timeQ = "\"1040\"";
+        assertEquals(Long.valueOf(1040L), Long.valueOf(timeQ.replaceAll("\"","")));
+    }
 
     @Test
     public void testReduce() throws Exception {

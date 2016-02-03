@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TreeSet;
 
 public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
 
     @Override
-    public void reduce(Text key, Iterable<Text> values, Context context)
-            throws IOException, InterruptedException {
+    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
         List<FlightInfo> origins = new ArrayList<FlightInfo>();
         List<FlightInfo> destinations = new ArrayList<FlightInfo>();
@@ -22,7 +22,8 @@ public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
             FlightInfo flightInfo;
             try {
                 flightInfo = new FlightInfo(key.toString(), value.toString());
-            } catch (FlightException ex) {
+            }
+            catch (FlightException ex) {
                 continue;
             }
 
@@ -37,6 +38,7 @@ public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
             }
         }
 
+        TreeSet<FlightResult> resultSet = new TreeSet<FlightResult>();
         for (FlightInfo dest : destinations) {
             for (FlightInfo org : origins) {
 
@@ -46,10 +48,19 @@ public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
                 Calendar calendarDest = Calendar.getInstance();
                 calendarDest.setTime(dest.getFlightDate());
 
-//                calendarDest.
-//
-//                if (dest.getDepartureTime())
+                calendarOrg.roll(Calendar.DAY_OF_YEAR, 2);
+                if (calendarOrg.compareTo(calendarDest) == 0) {
+                    resultSet.add(new FlightResult(org.getKeyAirport(), dest.getKeyAirport(), dest.getValueAirport(),
+                            org.getFlightDate(), dest.getFlightDate(), org.getArrivalDelay() + dest.getArrivalDelay()));
+                }
             }
+        }
+
+        for (FlightResult flightResult : resultSet) {
+            String keyOuput = String.format("%s:%s:%s", flightResult.getOriginAirport(), flightResult.getStopAirport(),
+                    flightResult.getDestinationAirport());
+            String valueOuput = flightResult.toString();
+            context.write(new Text(keyOuput), new Text(valueOuput));
         }
     }
 }

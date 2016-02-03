@@ -16,44 +16,22 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        FileSystem fs = FileSystem.get(conf);
-        Path tmpPath = new Path("/w1/tmp");
-        fs.delete(tmpPath, true);
+        Job bestFlightJob = Job.getInstance(conf, "Flights Job");
+        bestFlightJob.setJarByClass(Main.class);
 
-        Job airportsByNumberJob = Job.getInstance(conf, "airports by numbers of flights to/from the airport");
+        bestFlightJob.setOutputKeyClass(Text.class);
+        bestFlightJob.setOutputValueClass(Text.class);
 
-        airportsByNumberJob.setOutputKeyClass(Text.class);
-        airportsByNumberJob.setOutputValueClass(IntWritable.class);
+        bestFlightJob.setMapOutputKeyClass(Text.class);
+        bestFlightJob.setMapOutputValueClass(Text.class);
 
-        airportsByNumberJob.setMapperClass(BestFlightMapper.class);
-        airportsByNumberJob.setReducerClass(BestFlightReducer.class);
+        bestFlightJob.setMapperClass(BestFlightMapper.class);
+//        bestFlightJob.setCombinerClass(BestFlightReducer.class);
+        bestFlightJob.setReducerClass(BestFlightReducer.class);
 
-        FileInputFormat.addInputPath(airportsByNumberJob, new Path(args[0]));
-        FileOutputFormat.setOutputPath(airportsByNumberJob, tmpPath);
+        FileInputFormat.addInputPath(bestFlightJob, new Path(args[0]));
+        FileOutputFormat.setOutputPath(bestFlightJob, new Path(args[1]));
 
-        airportsByNumberJob.setJarByClass(Main.class);
-        airportsByNumberJob.waitForCompletion(true);
-
-        /******************/
-        Job topAirportsJob = Job.getInstance(conf, "10 most popular airports");
-
-        topAirportsJob.setOutputKeyClass(Text.class);
-        topAirportsJob.setOutputValueClass(IntWritable.class);
-
-        topAirportsJob.setMapOutputKeyClass(NullWritable.class);
-        topAirportsJob.setMapOutputValueClass(TextArrayWritable.class);
-        
-        topAirportsJob.setMapperClass(Top10AirportsMapper.class);
-        topAirportsJob.setReducerClass(Top10AirportsReducer.class);
-        topAirportsJob.setNumReduceTasks(1);
-
-        FileInputFormat.setInputPaths(topAirportsJob, tmpPath);
-        FileOutputFormat.setOutputPath(topAirportsJob, new Path(args[1]));
-
-        topAirportsJob.setInputFormatClass(KeyValueTextInputFormat.class);
-        topAirportsJob.setOutputFormatClass(TextOutputFormat.class);
-
-        topAirportsJob.setJarByClass(Main.class);
-        System.exit(topAirportsJob.waitForCompletion(true) ? 0 : 1);
+        System.exit(bestFlightJob.waitForCompletion(true) ? 0 : 1);
     }
 }
