@@ -3,6 +3,7 @@ package co.gersua.cloudmooc.mapred.g3q2;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -16,8 +17,8 @@ public class BestFlightMapperTest {
     @Test
     public void testMap() throws Exception {
 
-        BufferedReader br = new BufferedReader(new FileReader(("/Users/gersua/Projects/cloud-mooc-capstone/" +
-                "Capstone-Hadoop-G3Q2/src/test/resources/co/gersua/cloudmooc/mapred/g3q2/test.txt")));
+        File file = new File(getClass().getResource("test.txt").toURI());
+        BufferedReader br = new BufferedReader(new FileReader(file));
 
         String lineRead;
         while ((lineRead = br.readLine()) != null){

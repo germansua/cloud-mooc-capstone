@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class FlightInfo {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private String keyAirport;
     private String valueAirport;

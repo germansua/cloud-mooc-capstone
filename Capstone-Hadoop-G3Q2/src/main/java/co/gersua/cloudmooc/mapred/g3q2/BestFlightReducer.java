@@ -36,14 +36,15 @@ public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
             }
         }
 
-        if (bestOrgPerformance == null || bestDstPerformance == null) {
+        if (bestOrgPerformance == null || bestDstPerformance == null ||
+                bestOrgPerformance.getValueAirport().equals(bestDstPerformance.getValueAirport())) {
             return;
         }
 
         String outputKey = String.format("%s->%s->%s",
-                bestOrgPerformance.getKeyAirport(),
+                bestDstPerformance.getValueAirport(),
                 bestDstPerformance.getKeyAirport(),
-                bestDstPerformance.getValueAirport()
+                bestOrgPerformance.getValueAirport()
         );
 
         String outputValue = String.format("%s\t%d\t%d\t%s\t%d\t%d",
