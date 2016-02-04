@@ -2,91 +2,59 @@ package co.gersua.cloudmooc.mapred.g3q2;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 public class BestFlightReducer extends Reducer<Text, Text, Text, Text> {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
-        List<FlightInfo> origins = new ArrayList<FlightInfo>();
-        List<FlightInfo> destinations = new ArrayList<FlightInfo>();
+        FlightInfo bestOrgPerformance = null;
+        FlightInfo bestDstPerformance = null;
 
         for (Text value : values) {
             FlightInfo flightInfo;
             try {
                 flightInfo = new FlightInfo(key.toString(), value.toString());
-            }
-            catch (FlightException ex) {
+            } catch (FlightException ex) {
                 continue;
             }
 
             if (flightInfo.getType().equals("ORG")) {
-                if (flightInfo.getDepartureTime() >= 1200) {
-                    origins.add(flightInfo);
+                if (bestOrgPerformance == null || flightInfo.getArrivalDelay() < bestOrgPerformance.getArrivalDelay()) {
+                    bestOrgPerformance = flightInfo;
                 }
             } else {
-                if (flightInfo.getDepartureTime() <= 1200) {
-                    destinations.add(flightInfo);
+                if (bestDstPerformance == null || flightInfo.getArrivalDelay() < bestDstPerformance.getArrivalDelay()) {
+                    bestDstPerformance = flightInfo;
                 }
             }
         }
 
-        if (origins.isEmpty() || destinations.isEmpty()) {
+        if (bestOrgPerformance == null || bestDstPerformance == null) {
             return;
         }
 
-        context.write(new Text(String.valueOf(origins.size())), new Text(String.valueOf(destinations.size())));
+        String outputKey = String.format("%s->%s->%s",
+                bestOrgPerformance.getKeyAirport(),
+                bestDstPerformance.getKeyAirport(),
+                bestDstPerformance.getValueAirport()
+        );
 
-        //        TreeSet<FlightResult> resultSet = new TreeSet<FlightResult>();
+        String outputValue = String.format("%s\t%d\t%d\t%s\t%d\t%d",
+                DATE_FORMAT.format(bestOrgPerformance.getFlightDate()),
+                bestOrgPerformance.getDepartureTime(),
+                bestOrgPerformance.getArrivalDelay(),
+                DATE_FORMAT.format(bestDstPerformance.getFlightDate()),
+                bestDstPerformance.getDepartureTime(),
+                bestDstPerformance.getArrivalDelay()
+        );
 
-        Text keyText = new Text();
-        Text valueText = new Text();
-
-        for (FlightInfo dest : destinations) {
-            for (FlightInfo org : origins) {
-
-                Calendar calendarOrg = Calendar.getInstance();
-                calendarOrg.setTime(org.getFlightDate());
-
-                Calendar calendarDest = Calendar.getInstance();
-                calendarDest.setTime(dest.getFlightDate());
-
-                calendarOrg.roll(Calendar.DAY_OF_YEAR, 2);
-                if (calendarOrg.compareTo(calendarDest) == 0) {
-
-                    String keyOuput = String
-                            .format("%s->%s->%s", org.getKeyAirport(), dest.getKeyAirport(), dest.getValueAirport());
-
-                    String firstDateString = DATE_FORMAT.format(org.getFlightDate());
-                    String secondDateString = DATE_FORMAT.format(dest.getFlightDate());
-                    long total = org.getArrivalDelay() + dest.getArrivalDelay();
-                    String valueOuput = String.format("%s%s%d", firstDateString, secondDateString, total);
-
-                    keyText.set(keyOuput);
-                    valueText.set(valueOuput);
-                    context.write(keyText, valueText);
-                }
-            }
-        }
-
-
-        //
-        //        for (FlightResult flightResult : resultSet) {
-        //            String keyOuput = String.format("%s:%s:%s",
-        //                    flightResult.getOriginAirport(),
-        //                    flightResult.getStopAirport(),
-        //                    flightResult.getDestinationAirport());
-        //
-        //            String valueOuput = flightResult.toString();
-        //            context.write(new Text(keyOuput), new Text(valueOuput));
-        //        }
+        context.write(new Text(outputKey), new Text(outputValue));
     }
 }

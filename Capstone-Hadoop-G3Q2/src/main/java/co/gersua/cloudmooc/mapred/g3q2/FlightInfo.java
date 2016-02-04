@@ -7,6 +7,8 @@ import java.util.Date;
 
 public class FlightInfo {
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+
     private String keyAirport;
     private String valueAirport;
     private Date flightDate;
@@ -15,15 +17,16 @@ public class FlightInfo {
     private String type;
 
     public FlightInfo(String keyAirport, String values) throws FlightException {
-        this.keyAirport = keyAirport;
+
+        int dotIndex = keyAirport.indexOf(":");
+        this.keyAirport = keyAirport.substring(0, dotIndex);
 
         String[] data = values.split("\\s");
         valueAirport = data[0];
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         try {
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateFormat.parse(data[1]));
+            calendar.setTime(DATE_FORMAT.parse(data[1]));
             calendar.set(Calendar.HOUR, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -60,5 +63,17 @@ public class FlightInfo {
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return "FlightInfo{" +
+                "keyAirport='" + keyAirport + '\'' +
+                ", valueAirport='" + valueAirport + '\'' +
+                ", flightDate=" + flightDate +
+                ", departureTime=" + departureTime +
+                ", arrivalDelay=" + arrivalDelay +
+                ", type='" + type + '\'' +
+                '}';
     }
 }
