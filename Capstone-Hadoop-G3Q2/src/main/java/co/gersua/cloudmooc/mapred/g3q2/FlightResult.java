@@ -12,16 +12,16 @@ public class FlightResult implements Comparable<FlightResult> {
     private String destinationAirport;
     private Date firstDate;
     private Date secondDate;
-    private double totalArrivalDelay;
+    private long totalArrivalDelay;
 
     public FlightResult(String originAirport, String stopAirport, String destinationAirport, Date firstDate,
-            Date secondDate, double totalArrivalDelay) {
+            Date secondDate, long totalArrivalDelay) {
         this.originAirport = originAirport;
         this.stopAirport = stopAirport;
         this.destinationAirport = destinationAirport;
         this.firstDate = firstDate;
         this.secondDate = secondDate;
-        this.totalArrivalDelay = totalArrivalDelay;
+        this.totalArrivalDelay = Double.valueOf(totalArrivalDelay).longValue();
     }
 
     @Override
@@ -31,9 +31,10 @@ public class FlightResult implements Comparable<FlightResult> {
             return -1;
         }
 
-        String current = String.format("%s%s%s%d", originAirport, stopAirport, destinationAirport, Double.valueOf(totalArrivalDelay).longValue());
+        String current = String.format("%s%s%s%d", originAirport, stopAirport, destinationAirport, totalArrivalDelay);
+
         String compare = String.format("%s%s%s%d", getOriginAirport(), getStopAirport(),
-                getDestinationAirport(), Double.valueOf(getTotalArrivalDelay()).longValue());
+                getDestinationAirport(), getTotalArrivalDelay());
 
         return current.compareTo(compare);
     }
@@ -43,7 +44,7 @@ public class FlightResult implements Comparable<FlightResult> {
         String firstDateString = DATE_FORMAT.format(firstDate);
         String secondDateString = DATE_FORMAT.format(secondDate);
         return String.format("%s\t%s\t%s\t%s\t%s\t%d",
-                originAirport, stopAirport, destinationAirport, firstDateString, secondDateString, Double.valueOf(totalArrivalDelay).longValue());
+                originAirport, stopAirport, destinationAirport, firstDateString, secondDateString, totalArrivalDelay);
     }
 
     public String getOriginAirport() {
@@ -66,7 +67,7 @@ public class FlightResult implements Comparable<FlightResult> {
         return secondDate;
     }
 
-    public double getTotalArrivalDelay() {
+    public long getTotalArrivalDelay() {
         return totalArrivalDelay;
     }
 

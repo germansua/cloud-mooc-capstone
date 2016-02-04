@@ -16,6 +16,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+//        conf.setLong("mapred.task.timeout", 600000 * 5);
+
         Job bestFlightJob = Job.getInstance(conf, "Flights Job");
         bestFlightJob.setJarByClass(Main.class);
 

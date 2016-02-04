@@ -11,7 +11,7 @@ public class FlightInfo {
     private String valueAirport;
     private Date flightDate;
     private int departureTime;
-    private double arrivalDelay;
+    private long arrivalDelay;
     private String type;
 
     public FlightInfo(String keyAirport, String values) throws FlightException {
@@ -34,7 +34,7 @@ public class FlightInfo {
         }
 
         departureTime = Integer.valueOf(data[2].replaceAll("\"",""));
-        arrivalDelay = Double.valueOf(data[3]);
+        arrivalDelay = Double.valueOf(data[3]).longValue();
         type = data[4];
     }
 
@@ -54,7 +54,7 @@ public class FlightInfo {
         return departureTime;
     }
 
-    public double getArrivalDelay() {
+    public long getArrivalDelay() {
         return arrivalDelay;
     }
 
