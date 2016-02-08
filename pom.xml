@@ -24,5 +24,6 @@
     <module>Capstone-Hadoop-G3Q1</module>
     <module>Capstone-Hadoop-G2Q1Q2-All</module>
     <module>Capstone-Hadoop-G3Q2</module>
+    <module>Capstone-DynamoDB</module>
   </modules>
 </project>
