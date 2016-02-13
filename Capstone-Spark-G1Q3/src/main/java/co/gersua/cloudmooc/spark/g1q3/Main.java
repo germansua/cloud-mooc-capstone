@@ -36,22 +36,29 @@ public class Main {
         JavaPairRDD<String, AverageWrapper> daysValueCount = dayAverageWrapper.reduceByKey((aw1, aw2) ->
                 new AverageWrapper(aw1.getValue() + aw2.getValue(), aw1.getCount() + aw2.getCount()));
 
-//        Map<String, AverageWrapper> result = daysValueCount.collectAsMap();
-//        for (Map.Entry<String, AverageWrapper> entry : result.entrySet()) {
-//            System.out.printf("%s -> (%f, %d)\n",
-//                    entry.getKey(), entry.getValue().getValue(), entry.getValue().getCount());
-//        }
+        Map<String, AverageWrapper> resultMap = daysValueCount.collectAsMap();
+        List<Map.Entry<String, AverageWrapper>> listResults = new ArrayList<>();
+        listResults.addAll(resultMap.entrySet());
+        Collections.sort(listResults, (entry1, entry2) ->
+                Double.valueOf(entry1.getValue().getValue()).compareTo(entry2.getValue().getValue()));
 
-        JavaPairRDD<String, Double> resultRDD =
-                daysValueCount.mapValues(averageWrapper -> averageWrapper.getValue() / averageWrapper.getCount());
-
-        Map<String, Double> results = resultRDD.collectAsMap();
-        List<Map.Entry<String, Double>> listResults = new ArrayList<>();
-        listResults.addAll(results.entrySet());
-        Collections.sort(listResults, (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue()));
-
-        for (Map.Entry<String, Double> entry : listResults) {
-            System.out.printf("%s:\t%f\n", entry.getKey(), entry.getValue());
+        for (Map.Entry<String, AverageWrapper> entry : listResults) {
+            System.out.printf("%s -> (%f, %d)\n",
+                    entry.getKey(), entry.getValue().getValue(), entry.getValue().getCount());
         }
+
+//        JavaPairRDD<String, Double> resultRDD =
+//                daysValueCount.mapValues(averageWrapper -> averageWrapper.getValue() / averageWrapper.getCount());
+//
+//        Map<String, Double> results = resultRDD.collectAsMap();
+
+
+//        List<Map.Entry<String, Double>> listResults = new ArrayList<>();
+//        listResults.addAll(results.entrySet());
+//        Collections.sort(listResults, (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue()));
+//
+//        for (Map.Entry<String, Double> entry : listResults) {
+//            System.out.printf("%s:\t%f\n", entry.getKey(), entry.getValue());
+//        }
     }
 }
