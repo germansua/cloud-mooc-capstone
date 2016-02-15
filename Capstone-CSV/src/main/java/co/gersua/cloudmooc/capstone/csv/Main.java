@@ -40,15 +40,23 @@ public class Main {
 
 
         // Transformer for Group 2 Question 1 - 02 - Spark
-        CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g2.q1-02"), ".tx.g2.q1-02", SeparatorEnum.TAB,
-                "\"Origin\"", "\"UniqueCarrier\"", "\"DepDelay\"");
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g2.q1-02"), ".tx.g2.q1-02", SeparatorEnum.TAB,
+//                "\"Origin\"", "\"UniqueCarrier\"", "\"DepDelay\"");
 
 //
 //        // Transformer for Group 2 Question 2
 //        CSVTransformer.transformFiles(rootLocationFile,
 //                new File(rootLocation, "tx.g2.q2"), ".tx.g2.q2", SeparatorEnum.TAB,
 //                "\"Origin\"", "\"Dest\"", "\"DepDelayMinutes\"");
+
+
+        // Transformer for Group 2 Question 2 - 02 - Spark
+        CSVTransformer.transformFiles(rootLocationFile,
+                new File(rootLocation, "tx.g2.q2-02"), ".tx.g2.q2-02", SeparatorEnum.TAB,
+                "\"Origin\"", "\"Dest\"", "\"DepDelay\"");
+
+
 //
 //        // Transformer for Group 2 Question 3
 //        CSVTransformer.transformFiles(rootLocationFile,
