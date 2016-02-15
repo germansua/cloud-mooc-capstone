@@ -37,6 +37,13 @@ public class Main {
 //        CSVTransformer.transformFiles(rootLocationFile,
 //                new File(rootLocation, "tx.g2.q1"), ".tx.g2.q1", SeparatorEnum.TAB,
 //                "\"Origin\"", "\"UniqueCarrier\"", "\"DepDelayMinutes\"");
+
+
+        // Transformer for Group 2 Question 1 - 02 - Spark
+        CSVTransformer.transformFiles(rootLocationFile,
+                new File(rootLocation, "tx.g2.q1-02"), ".tx.g2.q1-02", SeparatorEnum.TAB,
+                "\"Origin\"", "\"UniqueCarrier\"", "\"DepDelay\"");
+
 //
 //        // Transformer for Group 2 Question 2
 //        CSVTransformer.transformFiles(rootLocationFile,
