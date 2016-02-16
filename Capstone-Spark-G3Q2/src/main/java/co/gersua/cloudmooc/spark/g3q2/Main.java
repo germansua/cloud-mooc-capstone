@@ -4,6 +4,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function2;
 
 import scala.Tuple2;
 
@@ -62,7 +63,7 @@ public class Main {
             }
             return partialResults;
         }).groupByKey().flatMapToPair(keyValue -> {
-            List<Tuple2<String, List<FlightInfo>>> partialResults = new ArrayList<>();
+            List<Tuple2<String, AggregateFlightInfo>> partialResults = new ArrayList<>();
             List<FlightInfo> firstFlight = new ArrayList<>();
             List<FlightInfo> secondFlight = new ArrayList<>();
 
@@ -83,16 +84,16 @@ public class Main {
             String[] values = keyValue._1().split(":");
             for (FlightInfo first : firstFlight) {
                 for (FlightInfo second : secondFlight) {
-                    String key = String.format("%s->%s->%s:%s",
-                            first.getOrigin(), first.getDest(), second.getDest(), values[1]);
-                    partialResults.add(new Tuple2<>(key, Arrays.asList(first, second)));
+                    String key = String
+                            .format("%s->%s->%s:%s", first.getOrigin(), first.getDest(), second.getDest(), values[1]);
+                    partialResults.add(new Tuple2<>(key, new AggregateFlightInfo(first, second)));
                 }
             }
 
             return partialResults;
-        }).
+        }).reduceByKey((afi1, afi2) -> afi1.totalArrDelay() <= afi2.totalArrDelay() ? afi1 : afi2)
 
-                foreach(tuple -> System.out
+                .foreach(tuple -> System.out
                         .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
 
         //                .groupByKey().flatMapToPair(tuple -> {
