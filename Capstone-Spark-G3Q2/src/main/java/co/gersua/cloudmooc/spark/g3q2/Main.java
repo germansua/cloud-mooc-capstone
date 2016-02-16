@@ -12,6 +12,7 @@ import java.util.*;
 public class Main {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final List<String> FILTER = Arrays.asList("CMI->ORD", "ORD->LAX");
 
     public static void main(String[] args) {
 
@@ -44,11 +45,11 @@ public class Main {
 
                 Calendar calendarOrg = getCalendar(flightDate);
                 calendarOrg.add(Calendar.DATE, 2);
-                String orgKey = String.format("%s->%s:%s", origin, dest, DATE_FORMAT.format(calendarOrg.getTime()));
+                String orgKey = String.format("%s->%s:%s:%s", origin, dest, DATE_FORMAT.format(calendarOrg.getTime()), String.valueOf(true));
                 FlightInfo orgFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, true);
 
                 Calendar calendarDst = getCalendar(flightDate);
-                String destKey = String.format("%s->%s:%s", dest, origin, DATE_FORMAT.format(calendarDst.getTime()));
+                String destKey = String.format("%s->%s:%s:%s", dest, origin, DATE_FORMAT.format(calendarDst.getTime()), String.valueOf(false));
                 FlightInfo destFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, false);
 
                 List<Tuple2<String, FlightInfo>> tupleList = new ArrayList<>();
@@ -70,6 +71,38 @@ public class Main {
 
             return Collections.emptyList();
         });
+
+        JavaPairRDD<String, FlightInfo> getMinimalDelays = keysCreation.reduceByKey((fInfo1, fInfo2) -> {
+            if (fInfo1.getArrDelay() <= fInfo2.getArrDelay()) {
+                return fInfo1;
+            } else {
+                return fInfo2;
+            }
+        });
+
+        getMinimalDelays.mapToPair(pair -> {
+            String dateKey = pair._1().split(":")[1];
+            return new Tuple2<>(dateKey, pair._2());
+
+        }).groupByKey().flatMapToPair(pair -> {
+            List<FlightInfo> orgList = new ArrayList<>();
+            List<FlightInfo> destList = new ArrayList<>();
+
+            String dateKey = pair._1();
+            for (FlightInfo flightInfo : pair._2()) {
+                if (flightInfo.isOriginKey()) {
+                    orgList.add(flightInfo);
+                } else {
+                    destList.add(flightInfo);
+                }
+            }
+            
+            System.out.println("For key: " + dateKey + ", OrgSize: " + orgList.size() + ", DstSize: " + destList.size());
+            return Collections.emptyList();
+        })
+
+
+                .foreach(voidTuple -> System.out.println("Pair: " + voidTuple));
     }
 
     public static final Calendar getCalendar(Date date) {

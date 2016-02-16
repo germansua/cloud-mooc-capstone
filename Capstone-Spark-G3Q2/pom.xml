@@ -21,7 +21,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>co.gersua.cloudmooc.spark.</mainClass>
+                            <mainClass>co.gersua.cloudmooc.spark.g3q2.Main</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>

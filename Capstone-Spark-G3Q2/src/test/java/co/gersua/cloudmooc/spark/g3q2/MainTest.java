@@ -26,5 +26,8 @@ public class MainTest {
 
         calendar.add(Calendar.DATE, 2);
         System.out.println("DATE: " + DATE_FORMAT.format(calendar.getTime()));
+
+        System.out.println(String.valueOf(true));
+        System.out.println(String.valueOf(false));
     }
 }

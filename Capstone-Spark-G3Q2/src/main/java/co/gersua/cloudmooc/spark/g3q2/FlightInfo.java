@@ -25,4 +25,36 @@ public class FlightInfo implements Serializable {
         this.arrDelay = arrDelay;
         this.originKey = originKey;
     }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDest() {
+        return dest;
+    }
+
+    public Date getFlightDate() {
+        return flightDate;
+    }
+
+    public String getFlightNum() {
+        return flightNum;
+    }
+
+    public int getCrsDepTime() {
+        return crsDepTime;
+    }
+
+    public int getDepTime() {
+        return depTime;
+    }
+
+    public double getArrDelay() {
+        return arrDelay;
+    }
+
+    public boolean isOriginKey() {
+        return originKey;
+    }
 }
