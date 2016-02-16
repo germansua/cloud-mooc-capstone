@@ -10,6 +10,7 @@ import scala.Tuple2;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Main {
@@ -86,38 +87,16 @@ public class Main {
                 for (FlightInfo second : secondFlight) {
                     String key = String
                             .format("%s->%s->%s:%s", first.getOrigin(), first.getDest(), second.getDest(), values[1]);
-                    partialResults.add(new Tuple2<>(key, new AggregateFlightInfo(first, second)));
+
+                    if (key.equals("CMI->ORD->LAX:2008-03-04")) {
+                        partialResults.add(new Tuple2<>(key, new AggregateFlightInfo(first, second)));
+                    }
                 }
             }
 
             return partialResults;
-        }).reduceByKey((afi1, afi2) -> afi1.totalArrDelay() <= afi2.totalArrDelay() ? afi1 : afi2)
-
-                .foreach(tuple -> System.out
-                        .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
-
-        //                .groupByKey().flatMapToPair(tuple -> {
-        //            List<Tuple2<String, List<FlightInfo>>> partialResults = new ArrayList<>();
-        //
-        //            Iterable<FlightInfo> flights = tuple._2();
-        //            for (FlightInfo flight1 : flights) {
-        //                for (FlightInfo flight2 : flights) {
-        //
-        //                    Date date1 = flight1.getFlightDate();
-        //                    Date date2 = flight2.getFlightDate();
-        //
-        //                    if (date1.compareTo(date2) < 0) {
-        //                        String key = String
-        //                                .format("%s->%s->%s", flight1.getOrigin(), flight1.getDest(), flight1.getDest());
-        //                        partialResults.add(new Tuple2<>(key, Arrays.asList(flight1, flight2)));
-        //                    }
-        //
-        //                }
-        //            }
-        //            return partialResults;
-        //        }).foreach(tuple -> System.out
-        //                .println("*******************************************\n\n\n" + tuple._1() + " : " + tuple._2() +
-        //                        "\n" + "\n" + "\n*******************************************"));
+        }).foreach(tuple -> System.out
+                .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
     }
 
     private static final Calendar getCalendar(Date date) {

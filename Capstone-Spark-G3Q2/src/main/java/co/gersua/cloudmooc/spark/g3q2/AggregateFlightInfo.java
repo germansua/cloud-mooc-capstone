@@ -60,4 +60,12 @@ public class AggregateFlightInfo implements Serializable {
     public FlightInfo getSecondFlight() {
         return secondFlight;
     }
+
+    @Override
+    public String toString() {
+        return "AggregateFlightInfo{" +
+                "firstFlight=" + firstFlight +
+                ", secondFlight=" + secondFlight +
+                '}';
+    }
 }
