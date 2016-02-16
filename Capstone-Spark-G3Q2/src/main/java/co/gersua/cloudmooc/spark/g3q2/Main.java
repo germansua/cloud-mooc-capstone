@@ -43,28 +43,33 @@ public class Main {
                 int depTime = Integer.valueOf(values[5].replace("\"", ""));
                 double arrDelay = Double.valueOf(values[6].replace("\"", ""));
 
-                Calendar calendarOrg = getCalendar(flightDate);
-                calendarOrg.add(Calendar.DATE, 2);
-                String orgKey = String.format("%s->%s:%s:%s", origin, dest, DATE_FORMAT.format(calendarOrg.getTime()), String.valueOf(true));
-                FlightInfo orgFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, true);
+                // First Flight is the one where Destination Airport is the Key
+                Calendar firstFlightCalendar = getCalendar(flightDate);
+                firstFlightCalendar.add(Calendar.DATE, 2);
+                String firstFlightKey = String.format("%s->%s:%s:%s", dest, origin, DATE_FORMAT.format(firstFlightCalendar.getTime()), String.valueOf(false));
+                FlightInfo firstFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, false);
 
-                Calendar calendarDst = getCalendar(flightDate);
-                String destKey = String.format("%s->%s:%s:%s", dest, origin, DATE_FORMAT.format(calendarDst.getTime()), String.valueOf(false));
-                FlightInfo destFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, false);
+                // Second Flight is the one where Origin Airport is the Key
+                Calendar secondFlightCalendar = getCalendar(flightDate);
+                String secondFlightKey = String.format("%s->%s:%s:%s", origin, dest, DATE_FORMAT.format(secondFlightCalendar.getTime()), String.valueOf(true));
+                FlightInfo secondFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, true);
 
                 List<Tuple2<String, FlightInfo>> tupleList = new ArrayList<>();
-                int departureTimeFilter = crsEnabled ? crsDepTime : depTime;
-                if (departureTimeFilter == 1200) {
-                    // Both
-                    tupleList.add(new Tuple2<>(orgKey, orgFlightInfo));
-                    tupleList.add(new Tuple2<>(destKey, destFlightInfo));
-                } else if (departureTimeFilter <= 1200) {
-                    // Only Origin
-                    tupleList.add(new Tuple2<>(orgKey, orgFlightInfo));
-                } else if (departureTimeFilter >= 1200) {
-                    // Only Dest
-                    tupleList.add(new Tuple2<>(destKey, destFlightInfo));
-                }
+                tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
+                tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
+
+//                int departureTimeFilter = crsEnabled ? crsDepTime : depTime;
+//                if (departureTimeFilter == 1200) {
+//                    // Both
+//                    tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
+//                    tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
+//                } else if (departureTimeFilter <= 1200) {
+//                    // Only Origin
+//                    tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
+//                } else if (departureTimeFilter >= 1200) {
+//                    // Only Dest
+//                    tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
+//                }
 
                 return tupleList;
             }
@@ -72,15 +77,15 @@ public class Main {
             return Collections.emptyList();
         });
 
-        JavaPairRDD<String, FlightInfo> getMinimalDelays = keysCreation.reduceByKey((fInfo1, fInfo2) -> {
-            if (fInfo1.getArrDelay() <= fInfo2.getArrDelay()) {
-                return fInfo1;
-            } else {
-                return fInfo2;
-            }
-        });
+//        JavaPairRDD<String, FlightInfo> getMinimalDelays = keysCreation.reduceByKey((fInfo1, fInfo2) -> {
+//            if (fInfo1.getArrDelay() <= fInfo2.getArrDelay()) {
+//                return fInfo1;
+//            } else {
+//                return fInfo2;
+//            }
+//        });
 
-        getMinimalDelays.mapToPair(pair -> {
+        keysCreation.mapToPair(pair -> {
             String[] values = pair._1().split(":");
             String[] keys = values[0].split("->");
             String joinKey = pair._2().isOriginKey() ? keys[1] : keys[0];
@@ -101,9 +106,9 @@ public class Main {
 
             List<Tuple2<String, List<FlightInfo>>> results = new ArrayList<>();
             if (!orgList.isEmpty() && !destList.isEmpty()) {
-                for (FlightInfo orgFI : orgList) {
-                    for (FlightInfo dstFI : destList) {
-                        String key = String.format("%s->%s->%s", dstFI.getDest(), dstFI.getOrigin(), orgFI.getDest());
+                for (FlightInfo dstFI : destList) {
+                    for (FlightInfo orgFI : orgList) {
+                        String key = String.format("%s->%s->%s", dstFI.getOrigin(), dstFI.getDest(), orgFI.getDest());
                         if (applyFilter) {
                             if (FILTER.contains(key)) {
                                 results.add(new Tuple2<>(key, Arrays.asList(orgFI, dstFI)));
