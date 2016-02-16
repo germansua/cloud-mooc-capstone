@@ -4,15 +4,16 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+
 import scala.Tuple2;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class Main {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final List<String> FILTER = Arrays.asList("CMI->ORD->LAX");
+    private static final List<String> FILTER = Arrays.asList("CMI");
 
     public static void main(String[] args) {
 
@@ -24,107 +25,101 @@ public class Main {
         final boolean applyFilter = Boolean.valueOf(args[3]);
         final boolean crsEnabled = args[3].equalsIgnoreCase("CRS");
 
-        SparkConf conf = new SparkConf().setAppName("Tom wants to travel from airport X to airport Z. " +
-                "However, Tom also wants to stop at airport Y for some sightseeing on the way.");
+        SparkConf conf = new SparkConf().setAppName("Tom wants to travel from airport X to airport Z. "
+                + "However, Tom also wants to stop at airport Y for some sightseeing on the way.");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         // Point to the file
         JavaRDD<String> lines = sc.textFile(args[0]);
 
-        JavaPairRDD<String, FlightInfo> keysCreation = lines.flatMapToPair(line -> {
+        lines.flatMapToPair(line -> {
+            List<Tuple2<String, FlightInfo>> partialResults = new ArrayList<>();
 
             String[] values = line.split("\t");
             if (values.length >= 7) {
+                // simpleDateFormat is here because it is not thread-safe
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
                 String origin = values[0].replace("\"", "");
                 String dest = values[1].replace("\"", "");
-                Date flightDate = DATE_FORMAT.parse(values[2].replace("\"", ""));
+                Date flightDate = simpleDateFormat.parse(values[2]);
                 String flightNum = values[3].replace("\"", "");
                 int crsDepTime = Integer.valueOf(values[4].replace("\"", ""));
                 int depTime = Integer.valueOf(values[5].replace("\"", ""));
                 double arrDelay = Double.valueOf(values[6].replace("\"", ""));
 
-                // First Flight is the one where Destination Airport is the Key
-                Calendar firstFlightCalendar = getCalendar(flightDate);
-                firstFlightCalendar.add(Calendar.DATE, 2);
-                String firstFlightKey = String.format("%s->%s:%s:%s", dest, origin, DATE_FORMAT.format(firstFlightCalendar.getTime()), String.valueOf(false));
-                FlightInfo firstFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, false);
+                Calendar calendar = getCalendar(flightDate);
+                String firstKey = String.format("%s:%s", origin, simpleDateFormat.format(calendar.getTime()));
 
-                // Second Flight is the one where Origin Airport is the Key
-                Calendar secondFlightCalendar = getCalendar(flightDate);
-                String secondFlightKey = String.format("%s->%s:%s:%s", origin, dest, DATE_FORMAT.format(secondFlightCalendar.getTime()), String.valueOf(true));
-                FlightInfo secondFlightInfo = new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, true);
+                calendar.add(Calendar.DATE, 2);
+                String secondKey = String.format("%s:%s", dest, simpleDateFormat.format(calendar.getTime()));
 
-                List<Tuple2<String, FlightInfo>> tupleList = new ArrayList<>();
-                tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
-                tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
+                partialResults.add(new Tuple2<>(firstKey,
+                        new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, true)));
 
-//                int departureTimeFilter = crsEnabled ? crsDepTime : depTime;
-//                if (departureTimeFilter == 1200) {
-//                    // Both
-//                    tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
-//                    tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
-//                } else if (departureTimeFilter <= 1200) {
-//                    // Only Origin
-//                    tupleList.add(new Tuple2<>(firstFlightKey, firstFlightInfo));
-//                } else if (departureTimeFilter >= 1200) {
-//                    // Only Dest
-//                    tupleList.add(new Tuple2<>(secondFlightKey, secondFlightInfo));
-//                }
-
-                return tupleList;
+                partialResults.add(new Tuple2<>(secondKey,
+                        new FlightInfo(origin, dest, flightDate, flightNum, crsDepTime, depTime, arrDelay, false)));
             }
+            return partialResults;
+        }).groupByKey().flatMapToPair(keyValue -> {
+            List<Tuple2<String, List<FlightInfo>>> partialResults = new ArrayList<>();
+            List<FlightInfo> firstFlight = new ArrayList<>();
+            List<FlightInfo> secondFlight = new ArrayList<>();
 
-            return Collections.emptyList();
-        });
+            keyValue._2().forEach(flightInfo -> {
+                int departureTime = crsEnabled ? flightInfo.getCrsDepTime() : flightInfo.getDepTime();
 
-//        JavaPairRDD<String, FlightInfo> getMinimalDelays = keysCreation.reduceByKey((fInfo1, fInfo2) -> {
-//            if (fInfo1.getArrDelay() <= fInfo2.getArrDelay()) {
-//                return fInfo1;
-//            } else {
-//                return fInfo2;
-//            }
-//        });
-
-        keysCreation.mapToPair(pair -> {
-            String[] values = pair._1().split(":");
-            String[] keys = values[0].split("->");
-            String joinKey = pair._2().isOriginKey() ? keys[1] : keys[0];
-            String date = values[1];
-            return new Tuple2<>(String.format("%s:%s", joinKey, date), pair._2());
-        }).groupByKey().flatMapToPair(pair -> {
-            List<FlightInfo> orgList = new ArrayList<>();
-            List<FlightInfo> destList = new ArrayList<>();
-
-            String dateKey = pair._1();
-            for (FlightInfo flightInfo : pair._2()) {
                 if (flightInfo.isOriginKey()) {
-                    orgList.add(flightInfo);
+                    if (departureTime >= 1200) {
+                        secondFlight.add(flightInfo);
+                    }
                 } else {
-                    destList.add(flightInfo);
-                }
-            }
-
-            List<Tuple2<String, List<FlightInfo>>> results = new ArrayList<>();
-            if (!orgList.isEmpty() && !destList.isEmpty()) {
-                for (FlightInfo dstFI : destList) {
-                    for (FlightInfo orgFI : orgList) {
-                        String key = String.format("%s->%s->%s", dstFI.getOrigin(), dstFI.getDest(), orgFI.getDest());
-                        if (applyFilter) {
-                            if (FILTER.contains(key)) {
-                                results.add(new Tuple2<>(key, Arrays.asList(orgFI, dstFI)));
-                            }
-                        } else {
-                            results.add(new Tuple2<>(key, Arrays.asList(orgFI, dstFI)));
-                        }
+                    if (departureTime <= 1200) {
+                        firstFlight.add(flightInfo);
                     }
                 }
+            });
+
+            String[] values = keyValue._1().split(":");
+            for (FlightInfo first : firstFlight) {
+                for (FlightInfo second : secondFlight) {
+                    String key = String.format("%s->%s->%s:%s",
+                            first.getOrigin(), first.getDest(), second.getDest(), values[1]);
+                    partialResults.add(new Tuple2<>(key, Arrays.asList(first, second)));
+                }
             }
 
-            return results;
-        }).foreach(tuple -> System.out.println("Pair: " + tuple._1() + ", Values: " + tuple._2()));
+            return partialResults;
+        }).
+
+                foreach(tuple -> System.out
+                        .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
+
+        //                .groupByKey().flatMapToPair(tuple -> {
+        //            List<Tuple2<String, List<FlightInfo>>> partialResults = new ArrayList<>();
+        //
+        //            Iterable<FlightInfo> flights = tuple._2();
+        //            for (FlightInfo flight1 : flights) {
+        //                for (FlightInfo flight2 : flights) {
+        //
+        //                    Date date1 = flight1.getFlightDate();
+        //                    Date date2 = flight2.getFlightDate();
+        //
+        //                    if (date1.compareTo(date2) < 0) {
+        //                        String key = String
+        //                                .format("%s->%s->%s", flight1.getOrigin(), flight1.getDest(), flight1.getDest());
+        //                        partialResults.add(new Tuple2<>(key, Arrays.asList(flight1, flight2)));
+        //                    }
+        //
+        //                }
+        //            }
+        //            return partialResults;
+        //        }).foreach(tuple -> System.out
+        //                .println("*******************************************\n\n\n" + tuple._1() + " : " + tuple._2() +
+        //                        "\n" + "\n" + "\n*******************************************"));
     }
 
-    public static final Calendar getCalendar(Date date) {
+    private static final Calendar getCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR, 0);
