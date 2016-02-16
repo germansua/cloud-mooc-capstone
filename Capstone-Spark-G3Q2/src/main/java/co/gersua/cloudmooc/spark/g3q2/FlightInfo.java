@@ -57,4 +57,18 @@ public class FlightInfo implements Serializable {
     public boolean isOriginKey() {
         return originKey;
     }
+
+    @Override
+    public String toString() {
+        return "FlightInfo{" +
+                "origin='" + origin + '\'' +
+                ", dest='" + dest + '\'' +
+                ", flightDate=" + flightDate +
+                ", flightNum='" + flightNum + '\'' +
+                ", crsDepTime=" + crsDepTime +
+                ", depTime=" + depTime +
+                ", arrDelay=" + arrDelay +
+                ", originKey=" + originKey +
+                '}';
+    }
 }

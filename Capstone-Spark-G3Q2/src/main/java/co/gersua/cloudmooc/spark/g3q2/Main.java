@@ -12,7 +12,7 @@ import java.util.*;
 public class Main {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final List<String> FILTER = Arrays.asList("CMI->ORD", "ORD->LAX");
+    private static final List<String> FILTER = Arrays.asList("CMI->ORD->LAX");
 
     public static void main(String[] args) {
 
@@ -81,9 +81,11 @@ public class Main {
         });
 
         getMinimalDelays.mapToPair(pair -> {
-            String dateKey = pair._1().split(":")[1];
-            return new Tuple2<>(dateKey, pair._2());
-
+            String[] values = pair._1().split(":");
+            String[] keys = values[0].split("->");
+            String joinKey = pair._2().isOriginKey() ? keys[1] : keys[0];
+            String date = values[1];
+            return new Tuple2<>(String.format("%s:%s", joinKey, date), pair._2());
         }).groupByKey().flatMapToPair(pair -> {
             List<FlightInfo> orgList = new ArrayList<>();
             List<FlightInfo> destList = new ArrayList<>();
@@ -96,13 +98,25 @@ public class Main {
                     destList.add(flightInfo);
                 }
             }
-            
-            System.out.println("For key: " + dateKey + ", OrgSize: " + orgList.size() + ", DstSize: " + destList.size());
-            return Collections.emptyList();
-        })
 
+            List<Tuple2<String, List<FlightInfo>>> results = new ArrayList<>();
+            if (!orgList.isEmpty() && !destList.isEmpty()) {
+                for (FlightInfo orgFI : orgList) {
+                    for (FlightInfo dstFI : destList) {
+                        String key = String.format("%s->%s->%s", dstFI.getDest(), dstFI.getOrigin(), orgFI.getDest());
+                        if (applyFilter) {
+                            if (FILTER.contains(key)) {
+                                results.add(new Tuple2<>(key, Arrays.asList(orgFI, dstFI)));
+                            }
+                        } else {
+                            results.add(new Tuple2<>(key, Arrays.asList(orgFI, dstFI)));
+                        }
+                    }
+                }
+            }
 
-                .foreach(voidTuple -> System.out.println("Pair: " + voidTuple));
+            return results;
+        }).foreach(tuple -> System.out.println("Pair: " + tuple._1() + ", Values: " + tuple._2()));
     }
 
     public static final Calendar getCalendar(Date date) {
