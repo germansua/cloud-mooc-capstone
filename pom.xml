@@ -30,5 +30,7 @@
     <module>Capstone-Spark-G2Q1</module>
     <module>Capstone-Spark-G2Q2</module>
     <module>Capstone-Spark-G2Q3</module>
+    <module>Capstone-Spark-G3Q1</module>
+    <module>Capstone-Spark-G3Q2</module>
   </modules>
 </project>

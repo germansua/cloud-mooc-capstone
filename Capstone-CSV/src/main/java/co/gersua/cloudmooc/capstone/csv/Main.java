@@ -22,8 +22,8 @@ public class Main {
 //                new File(rootLocation, "tx.g1.q1"), ".tx.g1.q1", SeparatorEnum.NEW_LINE, "\"Origin\"", "\"Dest\"");
 
         // Transformer for Group 1 Question 1
-        CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g1.q1_01"), ".tx.g1.q1_01", SeparatorEnum.TAB, "\"Origin\"", "\"Dest\"");
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g1.q1_01"), ".tx.g1.q1_01", SeparatorEnum.TAB, "\"Origin\"", "\"Dest\"");
 
 //        // Transformer for Group 1 Question 2
 //        CSVTransformer.transformFiles(rootLocationFile,
@@ -63,9 +63,9 @@ public class Main {
 
 
         // Transformer for Group 2 Question 3 - 02 - Spark
-        CSVTransformer.transformFiles(rootLocationFile,
-                new File(rootLocation, "tx.g2.q3-02"), ".tx.g2.q3-02", SeparatorEnum.TAB,
-                "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelay\"");
+//        CSVTransformer.transformFiles(rootLocationFile,
+//                new File(rootLocation, "tx.g2.q3-02"), ".tx.g2.q3-02", SeparatorEnum.TAB,
+//                "\"Origin\"", "\"Dest\"", "\"UniqueCarrier\"", "\"ArrDelay\"");
 
 //
 //        // For Group 3 Question 1 the data used is the same that Group 1 Question 1
@@ -74,5 +74,10 @@ public class Main {
 //        CSVTransformer.transformFiles(rootLocationFile,
 //                new File(rootLocation, "tx.g3.q2"), ".tx.g3.q2", SeparatorEnum.TAB,
 //                "\"Origin\"", "\"Dest\"", "\"FlightDate\"", "\"CRSDepTime\"", "\"ArrDelayMinutes\"");
+
+        // Transformer for Group 3 Question 2 - 02 Spark
+        CSVTransformer.transformFiles(rootLocationFile,
+                new File(rootLocation, "tx.g3.q2-02"), ".tx.g3.q2-02", SeparatorEnum.TAB,
+                "\"Origin\"", "\"Dest\"", "\"FlightDate\"", "\"FlightNum\"", "\"CRSDepTime\"", "\"DepTime\"", "\"ArrDelay\"");
     }
 }
