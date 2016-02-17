@@ -1,21 +1,17 @@
 package co.gersua.cloudmooc.spark.g3q2;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function2;
-
 import scala.Tuple2;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class Main {
 
-    private static final List<String> FILTER = Arrays.asList("CMI");
+    private static final List<String> FILTER_TASK1 = Arrays.asList("CMI->ORD->LAX:2008-03-06", "JAX->DFW->CRP:2008-09-11",
+            "SLC->BFL->LAX:2008-04-03", "LAX->SFO->PHX:2008-07-14", "DFW->ORD->DFW:2008-06-12", "LAX->ORD->JFK:2008-01-03");
 
     public static void main(String[] args) {
 
@@ -82,21 +78,37 @@ public class Main {
                 }
             });
 
+            Map<String, AggregateFlightInfo> resultsMap = new HashMap<>();
             String[] values = keyValue._1().split(":");
             for (FlightInfo first : firstFlight) {
                 for (FlightInfo second : secondFlight) {
                     String key = String
                             .format("%s->%s->%s:%s", first.getOrigin(), first.getDest(), second.getDest(), values[1]);
+                    AggregateFlightInfo aggregateFlightInfo = new AggregateFlightInfo(first, second);
 
-                    if (key.equals("CMI->ORD->LAX:2008-03-04")) {
-                        partialResults.add(new Tuple2<>(key, new AggregateFlightInfo(first, second)));
+                    AggregateFlightInfo currentAggregateValue = resultsMap.get(key);
+                    if (currentAggregateValue == null ||
+                            aggregateFlightInfo.totalArrDelay() < currentAggregateValue.totalArrDelay()) {
+                        resultsMap.put(key, aggregateFlightInfo);
                     }
                 }
             }
-
+            resultsMap.forEach((key, afi) -> {
+                if (applyFilter) {
+                    if (FILTER_TASK1.contains(key)) {
+                        partialResults.add(new Tuple2<>(key, afi));
+                    }
+                } else {
+                    partialResults.add(new Tuple2<>(key, afi));
+                }
+            });
             return partialResults;
-        }).foreach(tuple -> System.out
-                .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
+        })
+
+//                .reduceByKey((afi1, afi2) -> afi1.totalArrDelay() <= afi2.totalArrDelay() ? afi1 : afi2)
+
+                .foreach(tuple -> System.out
+                        .println("*******************************************\n" + tuple._1() + " : " + tuple._2()));
     }
 
     private static final Calendar getCalendar(Date date) {
