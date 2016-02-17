@@ -10,17 +10,18 @@ import java.util.*;
 
 public class Main {
 
-//    private static final List<String> AIRPORT_FILTER = Arrays.asList("CMI", "BWI", "MIA", "LAX", "IAH", "SFO");
+    private static final List<String> AIRPORT_FILTER_TASK1 = Arrays.asList("CMI", "BWI", "MIA", "LAX", "IAH", "SFO");
+    private static final List<String> AIRPORT_FILTER_TASK2 = Arrays.asList("SRQ", "CMH", "JFK", "SEA", "BOS");
 
     public static void main(String[] args) {
 
-        if (args.length < 2) {
-//            System.err.println("Usage: Main <input file> <output location> <filter enable>");
-            System.err.println("Usage: Main <input file> <output location>");
+        if (args.length < 3) {
+            System.err.println("Usage: Main <input file> <output location> <filter enable>");
+//            System.err.println("Usage: Main <input file> <output location>");
             System.exit(1);
         }
 
-//        final boolean applyFilter = Boolean.valueOf(args[2]);
+        final boolean applyFilter = Boolean.valueOf(args[2]);
 
         SparkConf conf = new SparkConf().setAppName("For each airport X, rank the top-10 carriers in " +
                 "decreasing order of on-time departure performance from X");
@@ -60,12 +61,12 @@ public class Main {
             AverageWrapper aw = tuple._2();
             CarrierDelay carrierDelay = new CarrierDelay(carrier, aw.getValue(), aw.getCount());
 
-//            if (applyFilter) {
-//                if (AIRPORT_FILTER.contains(airport)) {
-//                    return Arrays.asList(new Tuple2<>(airport, carrierDelay));
-//                }
-//                return Collections.emptyList();
-//            }
+            if (applyFilter) {
+                if (AIRPORT_FILTER_TASK2.contains(airport)) {
+                    return Arrays.asList(new Tuple2<>(airport, carrierDelay));
+                }
+                return Collections.emptyList();
+            }
             return Arrays.asList(new Tuple2<>(airport, carrierDelay));
         });
 
